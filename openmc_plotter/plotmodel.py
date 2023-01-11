@@ -725,14 +725,12 @@ class PlotModel():
         data_min = np.min(data)
         data_max = np.max(data)
 
-        if volume_normalization:
-            # all mesh voxels are equal volumes in a regular mesh
-            data = data / mesh.volumes[0][0]
+        # if volume_normalization:
+        #     # all mesh voxels are equal volumes in a regular mesh
+        #     data = np.divide(data, mesh.volumes[0][0][0])
 
         # set image data, reverse y-axis
         image_data = data[::-1, ...]
-        print(image_data)
-
 
         # return data extents (in cm) for the tally
         extents = [lower_left[h_ind], upper_right[h_ind],
