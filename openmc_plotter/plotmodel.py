@@ -61,10 +61,11 @@ _TALLY_VALUES = {'Mean': 'mean',
                  'Std. Dev.': 'std_dev',
                  'Rel. Error': 'rel_err'}
 
+
 def hash_file(filename):
     # return the md5 hash of a file
     h = hashlib.md5()
-    with open(filename,'rb') as file:
+    with open(filename, 'rb') as file:
         chunk = 0
         while chunk != b'':
             # read 32768 bytes at a time
@@ -168,7 +169,7 @@ class PlotModel():
                     # check GUI version
                     if data['version'] != self.version:
                         print("WARNING: previous plot settings are for a different "
-                            "version of the GUI. They will be ignored.")
+                              "version of the GUI. They will be ignored.")
                         wrn_msg = "Existing version: {}, Current GUI version: {}"
                         print(wrn_msg.format(data['version'], self.version))
                         view = None
@@ -433,6 +434,7 @@ class PlotModel():
                                              mean_data[0],
                                              out=np.zeros_like(mean_data[0]),
                                              where=mean_data != 0)
+                
                 extents = mean_data[1]
                 data_min = np.min(image_data)
                 data_max = np.max(image_data)
@@ -615,7 +617,7 @@ class PlotModel():
 
         return image_data, None, data_min, data_max
 
-    def _create_tally_mesh_image(self, tally, tally_value, scores, nuclides, view=None):
+    def _create_tally_mesh_image(self, tally, tally_value, scores, nuclides, volume_normalization=True, view=None):
         # some variables used throughout
         if view is None:
             view = self.currentView
@@ -723,8 +725,14 @@ class PlotModel():
         data_min = np.min(data)
         data_max = np.max(data)
 
+        if volume_normalization:
+            # all mesh voxels are equal volumes in a regular mesh
+            data = data / mesh.volumes[0][0]
+
         # set image data, reverse y-axis
         image_data = data[::-1, ...]
+        print(image_data)
+
 
         # return data extents (in cm) for the tally
         extents = [lower_left[h_ind], upper_right[h_ind],
@@ -842,6 +850,8 @@ class PlotViewIndependent:
         Minimum scale value for tally data
     tallyDataLogScale : bool
         Indicator of logarithmic scale for tally data
+    tallyVolumeNormalization : bool
+        Indicator volume normalization tally data
     tallyMaskZeroValues : bool
         Indicates whether or not zero values in tally data should be masked
     clipTallyData: bool
@@ -887,6 +897,7 @@ class PlotViewIndependent:
         self.tallyDataMin = 0.0
         self.tallyDataMax = np.inf
         self.tallyDataLogScale = False
+        self.tallyVolumeNormalization = False
         self.tallyMaskZeroValues = False
         self.clipTallyData = False
         self.tallyValue = "Mean"

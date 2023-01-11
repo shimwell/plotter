@@ -923,6 +923,12 @@ class MainWindow(QMainWindow):
         if apply:
             self.applyChanges()
 
+    def toggleTallyVolumeNormalization(self, state, apply=False):
+        av = self.model.activeView
+        av.tallyVolumeNormalization = bool(state)
+        if apply:
+            self.applyChanges()
+
     def toggleTallyMaskZero(self, state):
         av = self.model.activeView
         av.tallyMaskZeroValues = bool(state)

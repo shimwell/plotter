@@ -788,6 +788,11 @@ class ColorForm(QWidget):
         self.maxBox.valueChanged.connect(max_connector)
 
         # Linear/Log scaling check box
+        self.volumeNormalizationBox = QCheckBox()
+        volume_normalization_connector = partial(main_window.toggleTallyLogScale)
+        self.volumeNormalizationBox.stateChanged.connect(volume_normalization_connector)
+
+        # Linear/Log scaling check box
         self.scaleBox = QCheckBox()
         scale_connector = partial(main_window.toggleTallyLogScale)
         self.scaleBox.stateChanged.connect(scale_connector)
@@ -817,6 +822,7 @@ class ColorForm(QWidget):
         self.layout.addRow("Custom Min/Max: ", self.userMinMaxBox)
         self.layout.addRow("Min: ", self.minBox)
         self.layout.addRow("Max: ", self.maxBox)
+        self.layout.addRow("volume Normalization: ", self.volumeNormalizationBox)
         self.layout.addRow("Log Scale: ", self.scaleBox)
         self.layout.addRow("Clip Data: ", self.clipDataBox)
         self.layout.addRow("Mask Zeros: ", self.maskZeroBox)
@@ -868,6 +874,7 @@ class ColorForm(QWidget):
         self.visibilityBox.setChecked(cv.tallyDataVisible)
         self.userMinMaxBox.setChecked(cv.tallyDataUserMinMax)
         self.scaleBox.setChecked(cv.tallyDataLogScale)
+        self.volumeNormalizationBox.setChecked(cv.tallyVolumeNormalization)
 
         self.updateMinMax()
         self.updateMaskZeros()
