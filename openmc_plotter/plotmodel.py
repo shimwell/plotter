@@ -389,14 +389,22 @@ class PlotModel():
         visible_selection = scores and nuclides
 
         if not tally_selected or not tally_visible or not visible_selection:
+            print(tally_selected)
+            print(tally_visible)
+            print(visible_selection)
             return (None, None, None, None, None)
 
         tally = self.statepoint.tallies[tally_id]
+        print(tally.mean)
 
         tally_value = _TALLY_VALUES[view.tallyValue]
 
+        print('tally_value', tally_value)  # prints mean
+
         # check score units
         units = {_SCORE_UNITS.get(score, _REACTION_UNITS) for score in scores}
+
+        print('units', units)
 
         if len(units) != 1:
             msg_box = QMessageBox()
@@ -632,6 +640,7 @@ class PlotModel():
 
         # start with reshaped data
         data = tally.get_reshaped_data(tally_value)
+        print('data', data)
 
         # determine basis indices
         if view.basis == 'xy':
@@ -679,25 +688,29 @@ class PlotModel():
         # move mesh axes to the end of the filters
         filter_idx = [type(filter) for filter in tally.filters].index(openmc.MeshFilter)
         data = np.moveaxis(data, filter_idx, -1)
+        print('moved data', data)
 
         # reshape data (with zyx ordering for mesh data)
         data = data.reshape(data.shape[:-1] + tuple(dimension[::-1]))
         data = data[..., data_slice[2], data_slice[1], data_slice[0]]
 
+        print('# reshaped data', data)
+
         # sum over the rest of the tally filters
         for tally_filter in tally.filters:
-            if type(tally_filter) == openmc.MeshFilter:
+            if type(tally_filter) in [openmc.MeshFilter, openmc.EnergyFunctionFilter]:
                 continue
 
             selected_bins = self.appliedFilters[tally_filter]
             if selected_bins:
                 # sum filter data for the selected bins
-                data = data[np.array(selected_bins)].sum(axis=0)
+                data = data[np.array(selected_bins)].sum(axis=0)[0]
             else:
                 # if the filter is completely unselected,
                 # set all of it's data to zero and remove the axis
                 data[:, ...] = 0.0
                 data = _do_op(data, tally_value)
+        print('data after sum', data)
 
         # filter by selected nuclides
         if not nuclides:

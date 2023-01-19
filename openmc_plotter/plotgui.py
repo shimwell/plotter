@@ -528,6 +528,7 @@ class PlotImage(FigureCanvas):
 
         # generate tally image
         image_data, extents, data_min, data_max, units = self.model.create_tally_image()
+        print('returned image_data',image_data)
 
         ### DRAW TALLY IMAGE ###
 
